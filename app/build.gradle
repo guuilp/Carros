@@ -24,4 +24,5 @@ dependencies {
     //Ativa a dependência da biblioteca de compatibilidade v7
     compile 'com.android.support:appcompat-v7:23.0.0'
     compile 'br.com.livroandroid:android-utils:1.0.1'
+    compile 'com.android.support:design:23.0.0'
 }
