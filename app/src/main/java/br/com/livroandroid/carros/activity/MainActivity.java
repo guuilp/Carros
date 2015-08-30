@@ -1,7 +1,9 @@
 package br.com.livroandroid.carros.activity;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,6 +16,8 @@ import java.util.List;
 import br.com.livroandroid.carros.R;
 import br.com.livroandroid.carros.adapter.NavDrawerMenuAdapter;
 import br.com.livroandroid.carros.adapter.NavDrawerMenuItem;
+import br.com.livroandroid.carros.fragments.CarrosFragment;
+import br.com.livroandroid.carros.fragments.SiteLivroFragment;
 import livroandroid.lib.fragment.NavigationDrawerFragment;
 
 public class MainActivity extends BaseActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -36,8 +40,10 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerLayout.setStatusBarBackground(R.color.primary_dark);
         mNavDrawerFragment.setUp(drawerLayout);
-    }
 
+        //Cor de fundo da barra de status
+        drawerLayout.setStatusBarBackground(R.color.primary_dark);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -47,12 +53,20 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if(id == R.id.action_about) {
+            toast("Clicou no Sobre");
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public NavigationDrawerFragment.NavDrawerListView getNavDrawerView(NavigationDrawerFragment navDrawerFrag, LayoutInflater layoutInflater, ViewGroup container) {
         View view = layoutInflater.inflate(R.layout.nav_drawer_listview, container, false);
+        //Preenche o cabeçalho com a foto, nome e e-mail
+        navDrawerFrag.setHeaderValues(view, R.id.listViewContainer, R.drawable.nav_drawer_header, R.drawable.ic_logo_user, R.string.nav_drawer_username, R.string.nav_drawer_email);
         return new NavigationDrawerFragment.NavDrawerListView(view,R.id.listView);
     }
 
@@ -66,7 +80,23 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     }
 
     @Override
-    public void onNavDrawerItemSelected(NavigationDrawerFragment navigationDrawerFragment, int i) {
-        //Método chamado ao selecionar um item do ListView
+    public void onNavDrawerItemSelected(NavigationDrawerFragment navigationDrawerFragment, int position) {
+        List<NavDrawerMenuItem> list = NavDrawerMenuItem.getList();
+        NavDrawerMenuItem selectedItem = list.get(position);
+        //Seleciona a linha
+        this.listAdapter.setSelected(position, true);
+        if(position == 0){
+            replaceFragment(new CarrosFragment());
+        } else if(position == 1){
+            replaceFragment(new SiteLivroFragment());
+        } else if(position == 2){
+            toast("Configurações");
+        } else {
+            Log.e("livroandroid", "Item de menu inválido");
+        }
+    }
+
+    private void replaceFragment(Fragment frag) {
+        getSupportFragmentManager().beginTransaction().replace(R.id.nav_drawer_container, frag, "TAG").commit();
     }
 }

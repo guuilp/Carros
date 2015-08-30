@@ -5,4 +5,10 @@
     <string name="site_livro">Site do Livro</string>
     <string name="configuracoes">Configurações</string>
     <string name="action_settings">Settings</string>
+    <string name="action_about">Sobre</string>
+    <string name="nav_drawer_username">Guilherme Lima Pereira</string>
+    <string name="nav_drawer_email">guuuilp@gmail.com</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

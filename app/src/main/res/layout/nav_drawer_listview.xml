@@ -5,6 +5,8 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <!-- Cabeçalho para o Nav Drawer (Material Design) -->
+    <include layout="@layout/nav_drawer_listview_header"/>
     <ListView
         android:id="@+id/listView"
         android:layout_width="match_parent"
