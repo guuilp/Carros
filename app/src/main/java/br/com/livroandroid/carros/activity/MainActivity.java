@@ -16,6 +16,7 @@ import java.util.List;
 import br.com.livroandroid.carros.R;
 import br.com.livroandroid.carros.adapter.NavDrawerMenuAdapter;
 import br.com.livroandroid.carros.adapter.NavDrawerMenuItem;
+import br.com.livroandroid.carros.fragments.AboutDialog;
 import br.com.livroandroid.carros.fragments.CarrosFragment;
 import br.com.livroandroid.carros.fragments.SiteLivroFragment;
 import livroandroid.lib.fragment.NavigationDrawerFragment;
@@ -55,7 +56,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if(id == R.id.action_about) {
-            toast("Clicou no Sobre");
+            AboutDialog.showAbout(getSupportFragmentManager());
             return true;
         }
 
