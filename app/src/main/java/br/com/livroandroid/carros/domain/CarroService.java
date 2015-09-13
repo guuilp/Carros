@@ -55,6 +55,8 @@ public class CarroService {
                 // Lê as informações de cada carro
                 c.nome = jsonCarro.optString("nome");
                 c.desc = jsonCarro.optString("desc");
+                c.latitude = jsonCarro.optString("latitude");
+                c.longitude = jsonCarro.optString("longitude");
                 c.urlFoto = jsonCarro.optString("url_foto");
                 c.urlInfo = jsonCarro.optString("url_info");
                 if (LOG_ON) {
