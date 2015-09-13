@@ -11,6 +11,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Callback;
 
 import java.util.List;
 
@@ -50,11 +51,11 @@ public class CarroAdapter extends RecyclerView.Adapter<CarroAdapter.CarrosViewHo
         Carro c = carros.get(position);
         holder.tNome.setText(c.nome);
         holder.progress.setVisibility(View.VISIBLE);
-        //Faz o download da foto e mostra o ProgressBar
-        Picasso.with(context).load(c.urlFoto).fit().into(holder.img, new com.squareup.picasso.Callback() {
+
+        Picasso.with(context).load(c.urlFoto).fit().into(holder.img, new Callback() {
             @Override
             public void onSuccess() {
-                holder.progress.setVisibility(View.GONE); //Download ok
+                holder.progress.setVisibility(View.GONE);
             }
 
             @Override
