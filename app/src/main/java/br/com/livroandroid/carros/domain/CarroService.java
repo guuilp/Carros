@@ -3,6 +3,10 @@ package br.com.livroandroid.carros.domain;
 import android.content.Context;
 import android.util.Log;
 
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,7 +17,6 @@ import java.util.List;
 
 import br.com.livroandroid.carros.R;
 import livroandroid.lib.utils.FileUtils;
-import livroandroid.lib.utils.HttpHelper;
 
 /**
  * Created by Guilherme on 06-Sep-15.
@@ -25,7 +28,7 @@ public class CarroService {
 
     public static List<Carro> getCarros(Context context, String tipo) throws IOException {
         String url = URL.replace("{tipo}", tipo);
-        String json = HttpHelper.doGet(url);
+        String json = doGet(url);
         List<Carro> carros = parserJSON(context, json);
         return carros;
     }
@@ -37,6 +40,15 @@ public class CarroService {
             return FileUtils.readRawFileString(context, R.raw.carros_esportivos, "UTF-8");
         }
         return FileUtils.readRawFileString(context, R.raw.carros_luxo, "UTF-8");
+    }
+
+    private static String doGet(String url) throws IOException {
+        OkHttpClient okHttpClient = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+        Response response = okHttpClient.newCall(request).execute();
+        return response.body().string();
     }
 
     private static List<Carro> parserJSON(Context context, String json) throws IOException {
