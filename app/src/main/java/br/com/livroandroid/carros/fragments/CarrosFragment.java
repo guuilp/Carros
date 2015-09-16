@@ -1,15 +1,18 @@
 package br.com.livroandroid.carros.fragments;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.io.IOException;
 import java.util.List;
 
 import br.com.livroandroid.carros.R;
@@ -50,10 +53,8 @@ public class CarrosFragment extends BaseFragment{
     }
 
     private void taskCarros() {
-        //Busca os carros
-        this.carros = CarroService.getCarros(getContext(), tipo);
-        //Atualiza a lista
-        recyclerView.setAdapter(new CarroAdapter(getContext(), carros, onClickCarro()));
+        //Busca os carros: dispara a task
+        new GetCarrosTask().execute();
     }
 
     private CarroAdapter.CarroOnClickListener onClickCarro() {
@@ -67,5 +68,27 @@ public class CarrosFragment extends BaseFragment{
                 //Toast.makeText(getContext(), "Carro: " + c.nome, Toast.LENGTH_LONG).show();
             }
         };
+    }
+
+    private class GetCarrosTask extends AsyncTask<Void, Void, List<Carro>> {
+        @Override
+        protected List<Carro> doInBackground(Void... params) {
+            try{
+                //Busca os carros em background (Thread)
+                return CarroService.getCarros(getContext(), tipo);
+            } catch(IOException e) {
+                Log.e("livroandroid", e.getMessage(), e);
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(List<Carro> carros) {
+            if(carros != null){
+                CarrosFragment.this.carros = carros;
+                //Atualiza a view na UI Thread
+                recyclerView.setAdapter(new CarroAdapter(getContext(), carros, onClickCarro()));
+            }
+        }
     }
 }

@@ -13,6 +13,7 @@ import java.util.List;
 
 import br.com.livroandroid.carros.R;
 import livroandroid.lib.utils.FileUtils;
+import livroandroid.lib.utils.HttpHelper;
 
 /**
  * Created by Guilherme on 06-Sep-15.
@@ -20,17 +21,13 @@ import livroandroid.lib.utils.FileUtils;
 public class CarroService {
     private static final boolean LOG_ON = false;
     private static final String TAG = "CarroService";
+    private static final String URL = "http://www.livroandroid.com.br/livro/carros/carros_{tipo}.json";
 
-    public static List<Carro> getCarros(Context context, String tipo) {
-        try {
-            String json = readFileFromTipo(context, tipo);
-            List<Carro> carros = parserJSON(context, json);
-            return carros;
-        } catch (Exception e) {
-            // TODO explicar exception
-            Log.e(TAG, "Erro ao ler os carros: " + e.getMessage(), e);
-            return null;
-        }
+    public static List<Carro> getCarros(Context context, String tipo) throws IOException {
+        String url = URL.replace("{tipo}", tipo);
+        String json = HttpHelper.doGet(url);
+        List<Carro> carros = parserJSON(context, json);
+        return carros;
     }
 
     private static String readFileFromTipo(Context context, String tipo) throws IOException {
