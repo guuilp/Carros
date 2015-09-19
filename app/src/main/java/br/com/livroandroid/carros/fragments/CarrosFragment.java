@@ -1,18 +1,16 @@
 package br.com.livroandroid.carros.fragments;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.io.IOException;
 import java.util.List;
 
 import br.com.livroandroid.carros.R;
@@ -26,6 +24,7 @@ public class CarrosFragment extends BaseFragment{
     private List<Carro> carros;
     private LinearLayoutManager mLayoutManager;
     private String tipo;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
@@ -35,7 +34,21 @@ public class CarrosFragment extends BaseFragment{
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setHasFixedSize(true);
+        //Swipe to refresh
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeToRefresh);
+        swipeRefreshLayout.setOnRefreshListener(OnRefreshListener());
+        swipeRefreshLayout.setColorSchemeColors(R.color.refresh_progress_1, R.color.refresh_progress_2, R.color.refresh_progress_3);
         return view;
+    }
+
+    private SwipeRefreshLayout.OnRefreshListener OnRefreshListener(){
+        return new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //Atualiza ao fazer o gesto Pull to Refresh
+                taskCarros(true);
+            }
+        };
     }
 
     @Override
@@ -49,12 +62,12 @@ public class CarrosFragment extends BaseFragment{
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
-        taskCarros();
+        taskCarros(false);
     }
 
-    private void taskCarros() {
+    private void taskCarros(boolean pullToRefresh) {
         //Busca os carros: dispara a task
-        new GetCarrosTask().execute();
+        startTask("carros", new GetCarrosTask(), pullToRefresh ? R.id.swipeToRefresh : R.id.progress);
     }
 
     private CarroAdapter.CarroOnClickListener onClickCarro() {
@@ -70,25 +83,33 @@ public class CarrosFragment extends BaseFragment{
         };
     }
 
-    private class GetCarrosTask extends AsyncTask<Void, Void, List<Carro>> {
+    private class GetCarrosTask implements TaskListener<List<Carro>> {
+
         @Override
-        protected List<Carro> doInBackground(Void... params) {
-            try{
-                //Busca os carros em background (Thread)
-                return CarroService.getCarros(getContext(), tipo);
-            } catch(IOException e) {
-                Log.e("livroandroid", e.getMessage(), e);
-                return null;
-            }
+        public List<Carro> execute() throws Exception {
+            //Busca os carros em background (Thread)
+            return CarroService.getCarros(getContext(), tipo);
         }
 
         @Override
-        protected void onPostExecute(List<Carro> carros) {
-            if(carros != null){
+        public void updateView(List<Carro> carros) {
+            if (carros != null) {
+                //Salva a lista de carros no atributo da classe
                 CarrosFragment.this.carros = carros;
                 //Atualiza a view na UI Thread
                 recyclerView.setAdapter(new CarroAdapter(getContext(), carros, onClickCarro()));
             }
+        }
+
+        @Override
+        public void onError(Exception e) {
+            //Qualquer exceção lançada no método execute, vai cair aqui.
+            alert("Ocorreu algum erro ao buscar os dados.");
+        }
+
+        @Override
+        public void onCancelled(String s) {
+
         }
     }
 }
