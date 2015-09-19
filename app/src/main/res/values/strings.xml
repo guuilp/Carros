@@ -29,4 +29,5 @@
     <string name="about_dialog_title">Livro Android</string>
     <string name="ok">OK</string>
     <string name="title_activity_carro">CarroActivity</string>
+    <string name="error_conexao_indisponivel">Conexão indisponível. Verifique seu Wi-Fi ou Rede móvel.</string>
 </resources>

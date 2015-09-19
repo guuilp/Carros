@@ -18,6 +18,7 @@ import br.com.livroandroid.carros.activity.CarroActivity;
 import br.com.livroandroid.carros.adapter.CarroAdapter;
 import br.com.livroandroid.carros.domain.Carro;
 import br.com.livroandroid.carros.domain.CarroService;
+import livroandroid.lib.utils.AndroidUtils;
 
 public class CarrosFragment extends BaseFragment{
     protected RecyclerView recyclerView;
@@ -45,8 +46,15 @@ public class CarrosFragment extends BaseFragment{
         return new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                //Atualiza ao fazer o gesto Pull to Refresh
-                taskCarros(true);
+                //Valida se existe conexão ao fazer o gesto Pull to Refresh
+                if(AndroidUtils.isNetworkAvailable(getContext())){
+                    //Atualiza ao fazer o gesto Pull to Refresh
+                    taskCarros(true);
+                } else {
+                    swipeRefreshLayout.setRefreshing(false);
+                    alert(R.string.error_conexao_indisponivel);
+                }
+
             }
         };
     }
