@@ -6,4 +6,12 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@color/primary_dark</item>
     </style>
+
+    <!-- Tema material para a tela de configurações -->
+    <style name="AppTheme.Material" parent="android:Theme.Material.Light.DarkActionBar" >
+        <!-- Cores -->
+        <item name="android:colorPrimary">@color/primary</item>
+        <item name="android:colorPrimaryDark">@color/primary_dark</item>
+        <item name="android:colorAccent">@color/accent</item>
+    </style>
 </resources>

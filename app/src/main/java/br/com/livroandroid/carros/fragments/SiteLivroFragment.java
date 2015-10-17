@@ -28,7 +28,7 @@ public class SiteLivroFragment extends BaseFragment{
         webview.loadUrl(URL_SOBRE);
 
         //Swipe to refresh
-         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeToRefresh);
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeToRefresh);
         swipeRefreshLayout.setOnRefreshListener(OnRefreshListener());
         swipeRefreshLayout.setColorSchemeResources(
                 R.color.refresh_progress_1,

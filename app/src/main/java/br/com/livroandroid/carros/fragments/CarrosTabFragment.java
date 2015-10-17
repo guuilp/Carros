@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 
 import br.com.livroandroid.carros.R;
 import br.com.livroandroid.carros.adapter.TabsAdapter;
+import livroandroid.lib.utils.Prefs;
 
 /**
  * Created by Guilherme on 12-Sep-15.
@@ -37,6 +38,10 @@ public class CarrosTabFragment extends BaseFragment implements TabLayout.OnTabSe
         tabLayout.setOnTabSelectedListener(this);
         //Se mudar o ViewPager, atualiza a tab selecionada
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+
+        int tabIdx = Prefs.getInteger(getContext(), "tabIdx");
+        mViewPager.setCurrentItem(tabIdx);
+
         return view;
     }
 
@@ -44,6 +49,8 @@ public class CarrosTabFragment extends BaseFragment implements TabLayout.OnTabSe
     public void onTabSelected(TabLayout.Tab tab) {
         //Se alterar a tab, atualiza o ViewPager
         mViewPager.setCurrentItem(tab.getPosition());
+        //Salva o índice da página/tab sleecionada
+        Prefs.setInteger(getContext(), "tabIdx", mViewPager.getCurrentItem());
     }
 
     @Override

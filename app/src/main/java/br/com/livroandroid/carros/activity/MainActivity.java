@@ -1,5 +1,6 @@
 package br.com.livroandroid.carros.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
@@ -14,12 +15,15 @@ import android.widget.ListAdapter;
 import java.util.List;
 
 import br.com.livroandroid.carros.R;
+import br.com.livroandroid.carros.activity.prefs.ConfiguracoesActivity;
+import br.com.livroandroid.carros.activity.prefs.ConfiguracoesV11Activity;
 import br.com.livroandroid.carros.adapter.NavDrawerMenuAdapter;
 import br.com.livroandroid.carros.adapter.NavDrawerMenuItem;
 import br.com.livroandroid.carros.fragments.AboutDialog;
 import br.com.livroandroid.carros.fragments.CarrosTabFragment;
 import br.com.livroandroid.carros.fragments.SiteLivroFragment;
 import livroandroid.lib.fragment.NavigationDrawerFragment;
+import livroandroid.lib.utils.AndroidUtils;
 
 public class MainActivity extends BaseActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
@@ -91,7 +95,11 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         } else if(position == 1){
             replaceFragment(new SiteLivroFragment());
         } else if(position == 2){
-            toast("Configurações");
+            if(AndroidUtils.isAndroid3Honeycomb()){
+                startActivity(new Intent(this, ConfiguracoesV11Activity.class));
+            } else {
+                startActivity(new Intent(this, ConfiguracoesActivity.class));
+            }
         } else {
             Log.e("livroandroid", "Item de menu inválido");
         }
