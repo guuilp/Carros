@@ -110,6 +110,17 @@ public class CarroDB extends SQLiteOpenHelper {
         }
     }
 
+    public List<Carro> findAllByTypo(String tipo){
+        SQLiteDatabase db = getWritableDatabase();
+        try{
+            //select * from carro where tipo = ?
+            Cursor c = db.query("carro", null, "tipo = '" + tipo + "'", null, null, null, null);
+            return toList(c);
+        } finally {
+            db.close();
+        }
+    }
+
     private List<Carro> toList(Cursor c) {
         List<Carro> carros = new ArrayList<Carro>();
         if(c.moveToFirst()){

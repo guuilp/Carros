@@ -1,5 +1,6 @@
 package br.com.livroandroid.carros.fragments;
 
+import android.app.backup.BackupManager;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -17,9 +18,12 @@ import livroandroid.lib.utils.Prefs;
 public class CarrosTabFragment extends BaseFragment implements TabLayout.OnTabSelectedListener {
     private ViewPager mViewPager;
     private TabLayout tabLayout;
+    private BackupManager backupManager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+        //Gerenciador de backup
+        backupManager = new BackupManager(getContext());
         View view = inflater.inflate(R.layout.fragment_carros_tab, container, false);
         //ViewPager
         mViewPager = (ViewPager) view.findViewById(R.id.viewPager);
@@ -51,12 +55,11 @@ public class CarrosTabFragment extends BaseFragment implements TabLayout.OnTabSe
         mViewPager.setCurrentItem(tab.getPosition());
         //Salva o índice da página/tab sleecionada
         Prefs.setInteger(getContext(), "tabIdx", mViewPager.getCurrentItem());
+        backupManager.dataChanged();
     }
 
     @Override
-    public void onTabUnselected(TabLayout.Tab tab) {
-
-    }
+    public void onTabUnselected(TabLayout.Tab tab) { }
 
     @Override
     public void onTabReselected(TabLayout.Tab tab) {

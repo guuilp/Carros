@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
+import br.com.livroandroid.carros.CarrosApplication;
 import br.com.livroandroid.carros.R;
 import br.com.livroandroid.carros.activity.CarroActivity;
 import br.com.livroandroid.carros.adapter.CarroAdapter;
@@ -28,7 +29,7 @@ public class CarrosFragment extends BaseFragment{
     private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_carros, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         mLayoutManager = new LinearLayoutManager(getActivity());
@@ -54,7 +55,6 @@ public class CarrosFragment extends BaseFragment{
                     swipeRefreshLayout.setRefreshing(false);
                     alert(R.string.error_conexao_indisponivel);
                 }
-
             }
         };
     }
@@ -73,9 +73,20 @@ public class CarrosFragment extends BaseFragment{
         taskCarros(false);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (CarrosApplication.getInstance().isPrecisaAtualizar(this.tipo)) {
+            // Faz a leitura novamente do banco de dados
+            taskCarros(false);
+            toast("Lista de carros atualizada!");
+        }
+    }
+
     private void taskCarros(boolean pullToRefresh) {
         //Busca os carros: dispara a task
-        startTask("carros", new GetCarrosTask(), pullToRefresh ? R.id.swipeToRefresh : R.id.progress);
+        startTask("carros", new GetCarrosTask(pullToRefresh), pullToRefresh ? R.id.swipeToRefresh : R.id.progress);
     }
 
     private CarroAdapter.CarroOnClickListener onClickCarro() {
@@ -93,10 +104,15 @@ public class CarrosFragment extends BaseFragment{
 
     private class GetCarrosTask implements TaskListener<List<Carro>> {
 
+        private boolean refresh;
+        public GetCarrosTask(boolean refresh){
+            this.refresh = refresh;
+        }
+
         @Override
         public List<Carro> execute() throws Exception {
             //Busca os carros em background (Thread)
-            return CarroService.getCarros(getContext(), tipo);
+            return CarroService.getCarros(getContext(), tipo, refresh);
         }
 
         @Override

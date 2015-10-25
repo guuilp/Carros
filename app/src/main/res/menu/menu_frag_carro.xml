@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_video"
+        android:icon="@drawable/ic_action_video"
+        android:title="Video"
+        android:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_maps"
+        android:icon="@drawable/ic_action_map"
+        android:title="Maps"
+        android:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_share"
+        android:icon="@drawable/ic_action_share"
+        android:title="Share"
+        android:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_edit"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:title="Editar"
+        android:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_remove"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:title="Remover"
+        android:showAsAction="ifRoom" />
+</menu>

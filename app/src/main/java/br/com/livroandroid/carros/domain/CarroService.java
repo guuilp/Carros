@@ -7,15 +7,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import br.com.livroandroid.carros.R;
-import livroandroid.lib.utils.FileUtils;
 import livroandroid.lib.utils.HttpHelper;
-import livroandroid.lib.utils.IOUtils;
 
 /**
  * Created by Guilherme on 06-Sep-15.
@@ -25,15 +21,31 @@ public class CarroService {
     private static final String TAG = "CarroService";
     private static final String URL = "http://www.livroandroid.com.br/livro/carros/carros_{tipo}.json";
 
-    public static List<Carro> getCarros(Context context, String tipo) throws IOException {
-        List<Carro> carros = getCarrosFromArquivo(context, tipo);
-        if(carros != null && carros.size() > 0 ){
-            //Encontrou o arquivo
-            return carros;
+    public static List<Carro> getCarros(Context context, String tipo, boolean refresh) throws IOException {
+        List<Carro> carros = null;
+        boolean buscaNoBancoDeDados = !refresh;
+        if (buscaNoBancoDeDados) {
+            //Busca no banco de dados
+            carros = getCarrosFromBanco(context, tipo);
+            if(carros != null && carros.size() > 0 ){
+                //Encontrou o arquivo
+                return carros;
+            }
         }
         //Se não encontrar, busca no webservice
         carros = getCarrosFromWebService(context, tipo);
         return carros;
+    }
+
+    private static List<Carro> getCarrosFromBanco(Context context, String tipo) throws IOException{
+        CarroDB db = new CarroDB(context);
+        try{
+            List<Carro> carros = db.findAllByTypo(tipo);
+            Log.d(TAG, "Retornando " + carros.size() + " carros [" + tipo + "] do banco.");
+            return carros;
+        } finally {
+            db.close();
+        }
     }
 
     //Abre o arquivo salvo, se existir, e cria a lista de carros
@@ -41,40 +53,26 @@ public class CarroService {
         String url = URL.replace("{tipo}", tipo);
         Log.d(TAG, "URL: " + url);
         String json = HttpHelper.doGet(url);
-        salvaArquivoNaMemoriaInterna(context, url, json);
         List<Carro> carros = parserJSON(context, json);
+        //Depois de buscar, salva os carros
+        salvarCarros(context, tipo, carros);
         return carros;
     }
 
-    //Faz a requisição HTTP, cria a lista de carros e salva o JSON em arquivo
-    private static List<Carro> getCarrosFromArquivo(Context context, String tipo) throws IOException {
-        String fileName = String.format("carros_%s.json", tipo);
-        Log.d(TAG, "Abrindo arquivo: " + fileName);
-        //Lê o arquivo da memória interna
-        String json = FileUtils.readFile(context, fileName, "UTF-8");
-        if(json == null){
-            Log.d(TAG, "Arquivo " +fileName+ "não encontrado.");
-            return null;
+    private static void salvarCarros(Context context, String tipo, List<Carro> carros) {
+        CarroDB db = new CarroDB(context);
+        try{
+            //Deleta os carros antigos pelo tipo para limpar o banco
+            db.deleteCarrosByTipo(tipo);
+            //Salva todos os carros
+            for(Carro c : carros){
+                c.tipo = tipo;
+                Log.d(TAG, "Salvando o carro " + c.nome);
+                db.save(c);
+            }
+        } finally {
+            db.close();
         }
-        List<Carro> carros = parserJSON(context, json);
-        Log.d(TAG, "Carros lidos do arquivo " +fileName+".");
-        return carros;
-    }
-
-    public static void salvaArquivoNaMemoriaInterna(Context context, String url, String json){
-        String fileName = url.substring(url.lastIndexOf("/")+1);
-        File file = FileUtils.getFile(context, fileName);
-        IOUtils.writeString(file, json);
-        Log.d(TAG, "Arquivo salvo: " + file);
-    }
-
-    private static String readFileFromTipo(Context context, String tipo) throws IOException {
-        if ("classicos".equals(tipo)) {
-            return FileUtils.readRawFileString(context, R.raw.carros_classicos, "UTF-8");
-        } else if ("esportivos".equals(tipo)) {
-            return FileUtils.readRawFileString(context, R.raw.carros_esportivos, "UTF-8");
-        }
-        return FileUtils.readRawFileString(context, R.raw.carros_luxo, "UTF-8");
     }
 
     private static List<Carro> parserJSON(Context context, String json) throws IOException {
